@@ -1,7 +1,7 @@
 package hibernate.pp_3_1_1.controller;
 
 import hibernate.pp_3_1_1.model.User;
-import hibernate.pp_3_1_1.service.UserServiceImpl;
+import hibernate.pp_3_1_1.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,15 +15,15 @@ import java.util.Optional;
 public class UserController {
 
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
-    public UserController(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/users")
     public String findAll(Model model) {
-        List<User> users = userServiceImpl.findAll();
+        List<User> users = userService.findAll();
         model.addAttribute("users", users.isEmpty() ? null : users);
         return "user-list";
     }
@@ -40,7 +40,7 @@ public class UserController {
         if (result.hasErrors()) {
             return "user-create";
         }
-        userServiceImpl.saveUser(user);
+        userService.saveUser(user);
         redirectAttributes.addFlashAttribute("message", "User created successfully!");
         return "redirect:/users";
     }
@@ -48,7 +48,7 @@ public class UserController {
 
     @GetMapping("/user-update")
     public String updateUserForm(@RequestParam("id") Long id, Model model) {
-        Optional<User> userOptional = userServiceImpl.findById(id);
+        Optional<User> userOptional = userService.findById(id);
         if (userOptional.isPresent()) {
             model.addAttribute("user", userOptional.get());
             return "user-update";
@@ -59,13 +59,13 @@ public class UserController {
 
     @PostMapping("/user-update")
     public String updateUser(User user) {
-        userServiceImpl.updateUser(user);
+        userService.updateUser(user);
         return "redirect:/users";
     }
 
     @GetMapping("/user-delete")
     public String deleteUser(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {
-        userServiceImpl.deleteUser(id);
+        userService.deleteUser(id);
         redirectAttributes.addFlashAttribute("message", "User deleted successfully!");
         return "redirect:/users";
     }
